@@ -109,12 +109,30 @@
                     </div>
 
                     <div class="input-wrapper">
-                        <label for="lugar" class="input-label">¿Dónde lo quieres Recibir?</label>
-                        <select class="input-field">
+                        <label class="input-label">¿Dónde deseas entregarlo?</label>
+                        <select id="lugar" class="input-field">
                             <option value="matriz">Aeropuerto (Matríz)</option>
-                            <option value="huatulco">Huatulco</option>
-                            <option value="puerto Escondido">Puerto Escondido</option>
+                            <option value="huatulco">Huatulco (+$3,000)</option>
+                            <option value="puerto Escondido">Puerto Escondido (+$3,000)</option>
                         </select>
+                    </div>
+                    <div class="input-wrapper" id="extras-wrapper">
+                        <label class="input-label">Extras (Costo adicional)</label>
+
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="porta-bebe" name="extras" value="porta-bebe">
+                            <label for="porta-bebe">Porta Bebé</label>
+                        </div>
+
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="porta-equipaje" name="extras" value="porta-equipaje">
+                            <label for="porta-equipaje">Porta Equipaje</label>
+                        </div>
+
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="chofer" name="extras" value="chofer">
+                            <label for="chofer">Chofer</label>
+                        </div>
                     </div>
                     <div class="input-wrapper">
                         <label for="fecha-inicio" class="input-label">Fecha de Inicio</label>
@@ -213,6 +231,8 @@
                 var cantidadPasajerosSelect = document.getElementById("cantidad-pasajeros");
                 var fechaInicioInput = document.getElementById("fecha-inicio");
                 var fechaFinInput = document.getElementById("fecha-fin");
+                var lugarEntregaSelect = document.getElementById("lugar");
+
 
                 // Añadir escuchadores de eventos para actualizar el precio al cambiar los valores
                 formulario.addEventListener("submit", function (event) {
@@ -241,6 +261,11 @@
                     this.value = this.value.replace(/\D/g, "");
                     calcularPrecio();
                 });
+
+                lugarEntregaSelect.addEventListener("change", function () {
+                    // Llamar a la función calcularPrecio() cuando cambie el lugar de entrega
+                    calcularPrecio();
+                });
             });
 
             function mostrarOpciones() {
@@ -248,6 +273,7 @@
                 var marcaAutoWrapper = document.getElementById("marca-auto-wrapper");
                 var pasajerosWrapper = document.getElementById("pasajeros-wrapper");
                 var marcaCamionetaWrapper = document.getElementById("marca-camioneta-wrapper");
+
 
                 // Ocultar todos los wrappers al principio
                 marcaAutoWrapper.style.display = "none";
@@ -322,6 +348,9 @@
                 var tipoAuto = document.getElementById("tipo-auto").value;
                 var marcaAuto = document.getElementById("marca-auto").value;
                 var cantidadPasajeros = document.getElementById("cantidad-pasajeros").value;
+                var lugarEntrega = document.getElementById("lugar").value;
+                var costoAdicional = (lugarEntrega === "huatulco" || lugarEntrega === "puerto Escondido") ? 3000 : 0;
+
 
 
                 var preciosBase = {
@@ -336,21 +365,22 @@
 
 
                 var diferenciaDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24));
-                var precioTotal = precioBase * diferenciaDias;
+                var precioTotal = precioBase * diferenciaDias + costoAdicional;
 
 
-                if (fechaInicio.getTime() === fechaFin.getTime()) {
 
-                    console.error("Error: Las fechas de inicio y fin no pueden ser iguales.");
+                if (fechaInicio.getTime() === fechaFin.getTime() || fechaInicio.getTime() > fechaFin.getTime()) {
+                    console.error("Error: Las fechas de inicio y fin no pueden ser iguales o la fecha de inicio no puede ser mayor que la fecha de fin.");
                     var resultadoElement = document.getElementById("resultado");
                     resultadoElement.innerHTML = "Recuerda que la duración mínima de alquiler es de un día";
-                } else {
+                }
+
+                else {
 
                     if (!isNaN(precioTotal)) {
                         var precioFormateado = precioTotal.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
                         var resultadoElement = document.getElementById("resultado");
-                        resultadoElement.innerHTML = "El precio total es: " + precioFormateado + " MXN";
-                        console.log("El precio total es: " + precioFormateado);
+                        resultadoElement.innerHTML = "Total Aproximado: " + precioFormateado + " MXN";
                     } else {
                         console.error("Error: El precio total no es un número válido");
                     }
@@ -431,7 +461,39 @@
                 color: #333;
             }
 
-            /* Puedes agregar más estilos según sea necesario */
+            /* Estilos específicos para checkboxes */
+            .checkbox-option {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .checkbox-option input[type="checkbox"] {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                width: 20px;
+                height: 20px;
+                border: 2px solid #4caf50;
+                border-radius: 4px;
+                margin-right: 8px;
+                cursor: pointer;
+            }
+
+            .checkbox-option input[type="checkbox"]:checked {
+                background-color: #4caf50;
+                border-color: #4caf50;
+            }
+
+            .checkbox-option label {
+                font-size: 14px;
+                margin: 0;
+                cursor: pointer;
+            }
+
+            .checkbox-option label:hover {
+                text-decoration: underline;
+            }
         </style>
     </main>
 
